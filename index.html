@@ -46,7 +46,6 @@
             margin-bottom: 40px;
             position: relative;
             z-index: 10;
-            /* 初期状態は透明（アニメーションで表示） */
             opacity: 0;
             animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
@@ -90,7 +89,6 @@
             text-align: center;
             box-sizing: border-box;
             
-            /* 初期状態は透明（アニメーションで表示） */
             opacity: 0; 
             transform: translateY(20px);
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
@@ -307,7 +305,7 @@
         <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
         
         <div class="input-group">
-            <input type="text" id="code" placeholder="コードを入力" autocomplete="off">
+            <input type="text" id="code" placeholder="例: 123-abc-XYZ" autocomplete="off" maxlength="11">
         </div>
         
         <button id="btn" onclick="handleManualAuth()">
@@ -343,6 +341,10 @@
 
         let iframeLoadCount = 0;
 
+        // ★コード形式の正規表現: 英数字3文字-英数字3文字-英数字3文字
+        // 大文字小文字区別なし (a-z, A-Z, 0-9)
+        const CODE_REGEX = /^[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}$/;
+
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const codeFromUrl = urlParams.get('code');
@@ -356,6 +358,31 @@
             }
         };
 
+        // 入力時のイベント：エラーを消す
+        document.getElementById('code').addEventListener('input', function(e) {
+            document.getElementById('error-msg').style.display = 'none';
+        });
+
+        // エラーを表示する関数（UI + 振動 + アラート）
+        function showError(message) {
+            const msgBox = document.getElementById('error-msg');
+            const authBox = document.getElementById('auth-box');
+            
+            // 1. UIに表示
+            msgBox.innerText = message;
+            msgBox.style.display = 'block';
+            
+            // 振動アニメーションのリセットと実行
+            authBox.classList.remove('shake-anim');
+            void authBox.offsetWidth; // Reflowを強制してアニメーションをリセット
+            authBox.classList.add('shake-anim');
+
+            // 2. アラートも表示 (UIの描画完了を待つため少し遅延)
+            setTimeout(() => {
+                alert(message);
+            }, 50);
+        }
+
         // UIの状態をリセットして認証画面を表示する関数
         function resetToAuthScreen(errorMessage) {
             const header = document.getElementById('page-header');
@@ -367,18 +394,17 @@
             // ローダーを隠す
             loader.classList.add('hidden');
 
-            // 認証画面要素の復活（スタイルを強制リセット）
+            // 認証画面要素の復活
             header.classList.remove('hidden');
             authBox.classList.remove('hidden');
             
-            // ★重要修正：強制的に不透明度を1に設定して表示させる
-            // CSSのデフォルトがopacity:0（アニメーション用）なので、""にするだけでは消えてしまう
+            // 強制的に不透明度を1に設定して表示させる
             header.style.opacity = "1";
-            header.style.transition = "none"; // 瞬時に表示
+            header.style.transition = "none";
             
             authBox.style.opacity = "1";
             authBox.style.transform = "translateY(0)";
-            authBox.style.transition = "none"; // 瞬時に表示
+            authBox.style.transition = "none";
 
             // ボタンの状態リセット
             btn.disabled = false;
@@ -386,19 +412,7 @@
 
             // エラーがある場合の処理
             if (errorMessage) {
-                // 1. UIに表示
-                msgBox.innerText = errorMessage;
-                msgBox.style.display = 'block';
-                
-                // 振動アニメーション
-                authBox.classList.remove('shake-anim');
-                void authBox.offsetWidth; 
-                authBox.classList.add('shake-anim');
-
-                // 2. アラートも表示 (UIの描画完了を待つため少し遅延)
-                setTimeout(() => {
-                    alert(errorMessage);
-                }, 100);
+                showError(errorMessage);
             } else {
                 msgBox.style.display = 'none';
             }
@@ -424,30 +438,29 @@
 
         function handleManualAuth() {
             const codeInput = document.getElementById('code');
-            const code = codeInput.value;
-            const msgBox = document.getElementById('error-msg');
-            const authBox = document.getElementById('auth-box');
+            let code = codeInput.value;
             
-            msgBox.style.display = 'none';
+            // 空白除去
+            code = code.trim();
+            codeInput.value = code;
 
+            // UI上のエラー表示はいったん消す
+            document.getElementById('error-msg').style.display = 'none';
+
+            // 1. 空チェック
             if (!code) {
-                const emptyMsg = "コードを入力してください";
-                
-                // 1. UIに表示
-                msgBox.innerText = emptyMsg;
-                msgBox.style.display = 'block';
-                
-                // 振動アニメーション
-                authBox.classList.remove('shake-anim');
-                void authBox.offsetWidth; 
-                authBox.classList.add('shake-anim');
-
-                // 2. アラートも表示
-                setTimeout(() => {
-                    alert(emptyMsg);
-                }, 100);
+                showError("コードを入力してください");
                 return;
             }
+
+            // 2. 正規表現による形式チェック
+            // matchではなくtestを使用し、bool値を判定
+            if (!CODE_REGEX.test(code)) {
+                showError("コードの形式が正しくありません。\n例: 123-abc-XYZ");
+                return;
+            }
+
+            // 3. 形式OKならAPI送信
             verifyCode(code, false);
         }
 
@@ -518,7 +531,7 @@
                     }
 
                 } else {
-                    // 失敗時（論理エラー）
+                    // 失敗時
                     const msg = isAutoCheck ? 
                         "このコードは既に使用済みか無効です。\n再回答はできません。" : 
                         data.message;
