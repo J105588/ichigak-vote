@@ -17,6 +17,8 @@
             --bg-color: #f4f6f9;
             --text-main: #333333;
             --box-shadow: 0 10px 30px rgba(24, 40, 70, 0.15);
+            --error-red: #d32f2f;
+            --error-bg: #fdecea;
         }
 
         body {
@@ -44,7 +46,9 @@
             margin-bottom: 40px;
             position: relative;
             z-index: 10;
-            animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            /* 初期状態は透明（アニメーションで表示） */
+            opacity: 0;
+            animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         header::after {
@@ -86,7 +90,7 @@
             text-align: center;
             box-sizing: border-box;
             
-            /* 初期状態の設定 */
+            /* 初期状態は透明（アニメーションで表示） */
             opacity: 0; 
             transform: translateY(20px);
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
@@ -136,7 +140,7 @@
         /* 入力フォーム */
         .input-group {
             position: relative;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
@@ -179,17 +183,11 @@
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             box-shadow: 0 4px 15px rgba(24, 40, 70, 0.3);
-        }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 54px;
+            margin-bottom: 0;
         }
 
         button:hover {
@@ -197,25 +195,26 @@
             box-shadow: 0 8px 25px rgba(24, 40, 70, 0.4);
             background-color: #2a3d61;
         }
-        button:hover::before { left: 100%; }
         button:active { transform: translateY(-1px); }
         button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* エラーメッセージ（修正箇所：改行対応） */
+        /* エラーメッセージ（UI表示用） */
         #error-msg {
-            color: #d32f2f;
+            display: none;
+            color: var(--error-red);
+            background-color: var(--error-bg);
+            border: 1px solid rgba(211, 47, 47, 0.2);
             margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
             font-weight: bold;
             font-size: 13px;
-            min-height: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            white-space: pre-wrap; /* \nを改行として表示 */
             line-height: 1.6;
-        }
-
-        #error-msg.visible {
-            opacity: 1;
+            white-space: pre-wrap;
+            text-align: center;
+            box-sizing: border-box;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
         }
 
         /* フォームエリア */
@@ -254,6 +253,7 @@
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
+        /* スピナー */
         .spinner {
             width: 40px;
             height: 40px;
@@ -261,8 +261,19 @@
             border-top: 4px solid var(--school-gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px auto;
         }
+        
+        .btn-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            display: inline-block;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -277,6 +288,8 @@
             color: var(--school-navy);
             font-weight: bold;
         }
+        
+        #loader span { margin-top: 20px; }
 
         .hidden { display: none !important; }
     </style>
@@ -297,8 +310,12 @@
             <input type="text" id="code" placeholder="コードを入力" autocomplete="off">
         </div>
         
-        <button id="btn" onclick="handleManualAuth()">認証する</button>
-        <p id="error-msg"></p>
+        <button id="btn" onclick="handleManualAuth()">
+            <span>認証する</span>
+        </button>
+        
+        <!-- エラーメッセージ -->
+        <div id="error-msg"></div>
     </div>
 
     <!-- 完了メッセージ -->
@@ -309,7 +326,7 @@
         <p style="font-size: 12px; color: #999;">この画面を閉じて終了してください。</p>
     </div>
 
-    <!-- ローダー -->
+    <!-- 全画面ローダー（URL遷移時用） -->
     <div id="loader" class="hidden">
         <div class="spinner"></div>
         <span>認証状況を確認しています...</span>
@@ -331,7 +348,7 @@
             const codeFromUrl = urlParams.get('code');
 
             if (codeFromUrl) {
-                // 自動認証アニメーション開始
+                // 自動認証: まず要素を隠してからローダー表示
                 fadeOutAuthArea(() => {
                     document.getElementById('loader').classList.remove('hidden');
                     verifyCode(codeFromUrl, true);
@@ -339,11 +356,58 @@
             }
         };
 
+        // UIの状態をリセットして認証画面を表示する関数
+        function resetToAuthScreen(errorMessage) {
+            const header = document.getElementById('page-header');
+            const authBox = document.getElementById('auth-box');
+            const loader = document.getElementById('loader');
+            const msgBox = document.getElementById('error-msg');
+            const btn = document.getElementById('btn');
+
+            // ローダーを隠す
+            loader.classList.add('hidden');
+
+            // 認証画面要素の復活（スタイルを強制リセット）
+            header.classList.remove('hidden');
+            authBox.classList.remove('hidden');
+            
+            // ★重要修正：強制的に不透明度を1に設定して表示させる
+            // CSSのデフォルトがopacity:0（アニメーション用）なので、""にするだけでは消えてしまう
+            header.style.opacity = "1";
+            header.style.transition = "none"; // 瞬時に表示
+            
+            authBox.style.opacity = "1";
+            authBox.style.transform = "translateY(0)";
+            authBox.style.transition = "none"; // 瞬時に表示
+
+            // ボタンの状態リセット
+            btn.disabled = false;
+            btn.innerHTML = '<span>認証する</span>';
+
+            // エラーがある場合の処理
+            if (errorMessage) {
+                // 1. UIに表示
+                msgBox.innerText = errorMessage;
+                msgBox.style.display = 'block';
+                
+                // 振動アニメーション
+                authBox.classList.remove('shake-anim');
+                void authBox.offsetWidth; 
+                authBox.classList.add('shake-anim');
+
+                // 2. アラートも表示 (UIの描画完了を待つため少し遅延)
+                setTimeout(() => {
+                    alert(errorMessage);
+                }, 100);
+            } else {
+                msgBox.style.display = 'none';
+            }
+        }
+
         function fadeOutAuthArea(callback) {
             const header = document.getElementById('page-header');
             const authBox = document.getElementById('auth-box');
             
-            // CSS transitionでフェードアウト
             header.style.transition = "opacity 0.5s";
             authBox.style.transition = "opacity 0.5s, transform 0.5s";
             
@@ -361,20 +425,30 @@
         function handleManualAuth() {
             const codeInput = document.getElementById('code');
             const code = codeInput.value;
+            const msgBox = document.getElementById('error-msg');
+            const authBox = document.getElementById('auth-box');
             
+            msgBox.style.display = 'none';
+
             if (!code) {
-                triggerShake();
+                const emptyMsg = "コードを入力してください";
+                
+                // 1. UIに表示
+                msgBox.innerText = emptyMsg;
+                msgBox.style.display = 'block';
+                
+                // 振動アニメーション
+                authBox.classList.remove('shake-anim');
+                void authBox.offsetWidth; 
+                authBox.classList.add('shake-anim');
+
+                // 2. アラートも表示
+                setTimeout(() => {
+                    alert(emptyMsg);
+                }, 100);
                 return;
             }
             verifyCode(code, false);
-        }
-
-        function triggerShake() {
-            const authBox = document.getElementById('auth-box');
-            // 一度クラスを外してリフローさせてから付け直すことでアニメーションを再生
-            authBox.classList.remove('shake-anim');
-            void authBox.offsetWidth; 
-            authBox.classList.add('shake-anim');
         }
 
         document.getElementById('target-frame').onload = function() {
@@ -393,7 +467,7 @@
 
             setTimeout(() => {
                 formArea.classList.add('hidden');
-                document.body.style.backgroundColor = "";
+                document.body.style.backgroundColor = ""; 
                 document.body.style.backgroundImage = ""; 
 
                 const header = document.getElementById('page-header');
@@ -402,12 +476,10 @@
                 header.classList.remove('hidden');
                 completeBox.classList.remove('hidden');
                 
-                // 表示を強制的にリセット
                 header.style.opacity = ""; 
                 completeBox.style.opacity = "";
                 completeBox.style.transform = "";
                 
-                // 完了画面のアニメーション再生
                 completeBox.style.animation = 'none';
                 completeBox.offsetHeight; 
                 completeBox.style.animation = 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
@@ -418,15 +490,10 @@
 
         function verifyCode(code, isAutoCheck) {
             const btn = document.getElementById('btn');
-            const msg = document.getElementById('error-msg');
-            const loader = document.getElementById('loader');
-            const authBox = document.getElementById('auth-box');
-            const header = document.getElementById('page-header');
             
             if (!isAutoCheck) {
                 btn.disabled = true;
-                btn.innerHTML = '確認中<span style="display:inline-block; animation:spin 1s infinite linear; margin-left:5px;">↻</span>';
-                msg.classList.remove('visible');
+                btn.innerHTML = '確認中 <div class="btn-spinner"></div>';
             }
 
             fetch(API_URL, {
@@ -435,9 +502,10 @@
             })
             .then(response => response.json())
             .then(data => {
-                loader.classList.add('hidden');
-
                 if (data.result === 'success') {
+                    // 成功時
+                    document.getElementById('loader').classList.add('hidden');
+                    
                     if (!isAutoCheck) {
                         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?code=' + code;
                         window.history.pushState({path: newUrl}, '', newUrl);
@@ -450,53 +518,23 @@
                     }
 
                 } else {
-                    // --- 失敗時の処理 ---
+                    // 失敗時（論理エラー）
+                    const msg = isAutoCheck ? 
+                        "このコードは既に使用済みか無効です。\n再回答はできません。" : 
+                        data.message;
+                    
                     if (isAutoCheck) {
-                        // 自動チェック失敗時は隠していた要素を強制的に戻す
-                        header.classList.remove('hidden');
-                        authBox.classList.remove('hidden');
-
-                        // インラインスタイルを削除してCSSクラスの状態に戻す
-                        header.style.opacity = ""; 
-                        authBox.style.opacity = "";
-                        authBox.style.transform = ""; 
-                        
-                        msg.innerText = "このコードは既に使用済みです。\n再回答はできません。";
-                        msg.classList.add('visible');
-                        
-                        triggerShake();
-                        
                         document.getElementById('code').value = "";
                         window.history.replaceState({}, '', window.location.pathname);
-                    } else {
-                        // 手動チェック失敗時
-                        authBox.classList.remove('hidden');
-                        msg.innerText = data.message;
-                        msg.classList.add('visible');
-                        triggerShake();
-                        
-                        btn.disabled = false;
-                        btn.innerText = "認証する";
                     }
+                    
+                    resetToAuthScreen(msg);
                 }
             })
             .catch(error => {
+                // 通信エラー時
                 console.error('Error:', error);
-                loader.classList.add('hidden');
-                
-                // エラー発生時も表示を強制復帰
-                header.classList.remove('hidden');
-                authBox.classList.remove('hidden');
-                header.style.opacity = ""; 
-                authBox.style.opacity = "";
-                authBox.style.transform = "";
-
-                msg.innerText = "通信エラーが発生しました。\nもう一度お試しください。";
-                msg.classList.add('visible');
-                triggerShake();
-                
-                btn.disabled = false;
-                btn.innerText = "認証する";
+                resetToAuthScreen("通信エラーが発生しました。\nもう一度お試しください。");
             });
         }
 
