@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>市川学園 文化祭投票フォーム</title>
+    <!-- Google Fonts: 高級感のある明朝体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         /* 市川学園風テーマ設定 */
         :root {
@@ -11,119 +16,230 @@
             --school-gold: #bfa455;
             --bg-color: #f4f6f9;
             --text-main: #333333;
+            --box-shadow: 0 10px 30px rgba(24, 40, 70, 0.15);
         }
 
         body {
-            font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS PMincho", serif;
+            font-family: 'Noto Serif JP', "Yu Mincho", serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 10%, #fff 0%, var(--bg-color) 60%);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         /* ヘッダーエリア */
         header {
             width: 100%;
-            background-color: var(--school-navy);
+            background: linear-gradient(135deg, var(--school-navy) 0%, #0f1a30 100%);
             color: white;
-            padding: 20px 0;
+            padding: 25px 0;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             margin-bottom: 40px;
+            position: relative;
+            z-index: 10;
+            animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--school-navy) 0%, var(--school-gold) 50%, var(--school-navy) 100%);
         }
 
         .school-name {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 0.1em;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
             margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
         .sub-title {
             font-family: "Helvetica Neue", Arial, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             opacity: 0.8;
-            margin-top: 5px;
-            letter-spacing: 0.05em;
+            margin-top: 8px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
         }
 
         /* 共通ボックスデザイン */
         .box-style {
             background: white;
             width: 90%;
-            max-width: 450px;
-            padding: 40px 30px;
+            max-width: 480px;
+            padding: 50px 35px;
             border-top: 5px solid var(--school-gold);
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
             text-align: center;
             box-sizing: border-box;
+            opacity: 0; /* アニメーション用初期値 */
+            transform: translateY(20px); /* アニメーション用初期値 */
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .box-style:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(24, 40, 70, 0.2);
         }
 
         h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 15px;
             color: var(--school-navy);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background-color: var(--school-gold);
+            margin: 0 auto;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            transition: width 0.3s ease;
+        }
+
+        .box-style:hover h2::after {
+            width: 80px;
         }
 
         p {
             font-family: "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
             color: #666;
-            margin-bottom: 25px;
-            line-height: 1.6;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        /* 入力フォーム */
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 2px;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
             box-sizing: border-box;
-            margin-bottom: 20px;
             text-align: center;
-            letter-spacing: 0.1em;
-            transition: border-color 0.3s;
+            letter-spacing: 0.15em;
             font-family: "Helvetica Neue", Arial, sans-serif;
+            transition: all 0.3s ease;
+            background-color: #fbfbfb;
+        }
+
+        input[type="text"]::placeholder {
+            color: #ccc;
+            transition: color 0.3s ease;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--school-navy);
-            background-color: #fcfcfc;
+            border-color: var(--school-gold);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(191, 164, 85, 0.15);
+            transform: scale(1.01);
+        }
+        
+        input[type="text"]:focus::placeholder {
+            color: transparent;
         }
 
+        /* ボタンデザイン */
         button {
-            background-color: var(--school-navy);
+            background: linear-gradient(135deg, var(--school-navy) 0%, #2a3d61 100%);
             color: white;
-            padding: 12px 40px;
+            padding: 16px 40px;
             font-size: 16px;
             border: none;
-            border-radius: 2px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: opacity 0.3s, transform 0.1s;
             font-family: "Helvetica Neue", Arial, sans-serif;
             font-weight: bold;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
             width: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(24, 40, 70, 0.3);
         }
 
-        button:hover { opacity: 0.9; }
-        button:active { transform: translateY(1px); }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        /* ボタンの光るエフェクト */
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
 
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(24, 40, 70, 0.4);
+            background-color: #2a3d61;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(24, 40, 70, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* エラーメッセージ */
         #error-msg {
             color: #d32f2f;
-            margin-top: 15px;
+            margin-top: 20px;
             font-weight: bold;
             font-size: 13px;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #error-msg.visible {
+            opacity: 1;
         }
 
         /* フォームエリア */
@@ -133,6 +249,8 @@
             display: flex;
             flex-direction: column;
             background: white;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
         }
 
         iframe {
@@ -141,14 +259,61 @@
             border: none;
         }
 
-        .hidden { display: none !important; }
+        /* アニメーション定義 */
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* エラー時の振動アニメーション */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake-anim {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        /* ローディングスピナー */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--school-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         #loader {
+            text-align: center;
+            margin-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             color: var(--school-navy);
             font-weight: bold;
-            font-family: sans-serif;
-            margin-top: 50px;
         }
+
+        .hidden { display: none !important; }
+
     </style>
 </head>
 <body>
@@ -163,14 +328,17 @@
         <h2>シリアルコード認証</h2>
         <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
         
-        <input type="text" id="code" placeholder="コードを入力" autocomplete="off">
-        <br>
+        <div class="input-group">
+            <input type="text" id="code" placeholder="コードを入力" autocomplete="off">
+        </div>
+        
         <button id="btn" onclick="handleManualAuth()">認証する</button>
         <p id="error-msg"></p>
     </div>
 
-    <!-- 完了メッセージエリア（送信後に表示） -->
+    <!-- 完了メッセージエリア -->
     <div id="complete-box" class="box-style hidden">
+        <div style="font-size: 40px; color: var(--school-gold); margin-bottom: 10px;">✔</div>
         <h2>回答完了</h2>
         <p>回答ありがとうございました。<br>送信が正常に完了いたしました。</p>
         <p style="font-size: 12px; color: #999;">この画面を閉じて終了してください。</p>
@@ -178,7 +346,8 @@
 
     <!-- ローダー -->
     <div id="loader" class="hidden">
-        認証状況を確認しています...
+        <div class="spinner"></div>
+        <span>認証状況を確認しています...</span>
     </div>
 
     <!-- フォームエリア -->
@@ -190,7 +359,6 @@
         // ▼ ここにGASのウェブアプリURLを貼り付けてください ▼
         const API_URL = "https://script.google.com/macros/s/AKfycbwRdqr4FR4ftRbci_oc6ioiKQUorrUaapsKPPyj41pmftBRmMaLx_XnuDB2_28hNFrmEg/exec"; 
 
-        // Iframeの読み込み回数カウンター
         let iframeLoadCount = 0;
 
         window.onload = function() {
@@ -198,45 +366,89 @@
             const codeFromUrl = urlParams.get('code');
 
             if (codeFromUrl) {
-                document.getElementById('page-header').classList.add('hidden');
-                document.getElementById('auth-box').classList.add('hidden');
-                document.getElementById('loader').classList.remove('hidden');
-                verifyCode(codeFromUrl, true);
+                // 自動遷移の場合のアニメーション
+                fadeOutAuthArea(() => {
+                    document.getElementById('loader').classList.remove('hidden');
+                    verifyCode(codeFromUrl, true);
+                });
             }
         };
 
-        function handleManualAuth() {
-            const codeInput = document.getElementById('code').value;
-            if (!codeInput) return;
-            verifyCode(codeInput, false);
+        function fadeOutAuthArea(callback) {
+            const header = document.getElementById('page-header');
+            const authBox = document.getElementById('auth-box');
+            
+            header.style.transition = "opacity 0.5s";
+            authBox.style.transition = "opacity 0.5s, transform 0.5s";
+            
+            header.style.opacity = "0";
+            authBox.style.opacity = "0";
+            authBox.style.transform = "translateY(-20px)";
+
+            setTimeout(() => {
+                header.classList.add('hidden');
+                authBox.classList.add('hidden');
+                if(callback) callback();
+            }, 500);
         }
 
-        // 送信完了検知のためのイベントリスナー設定
+        function handleManualAuth() {
+            const codeInput = document.getElementById('code');
+            const code = codeInput.value;
+            
+            if (!code) {
+                triggerShake();
+                return;
+            }
+            verifyCode(code, false);
+        }
+
+        // エラー時の振動アニメーション発火
+        function triggerShake() {
+            const authBox = document.getElementById('auth-box');
+            authBox.classList.remove('shake-anim');
+            void authBox.offsetWidth; // リフロー発生
+            authBox.classList.add('shake-anim');
+        }
+
         document.getElementById('target-frame').onload = function() {
             if (iframeLoadCount === 0) {
-                // 初回ロード（フォーム表示）は何もしない
                 iframeLoadCount++;
             } else {
-                // 2回目以降のロード（＝送信ボタン押下後とみなす）
                 showCompleteScreen();
             }
         };
 
         function showCompleteScreen() {
-            // フォームを隠してヘッダーと完了メッセージを表示
-            document.getElementById('form-area').classList.add('hidden');
+            const formArea = document.getElementById('form-area');
             
-            // 背景色を戻す
-            document.body.style.backgroundColor = ""; 
-            
-            const header = document.getElementById('page-header');
-            header.classList.remove('hidden');
+            // フェードアウト
+            formArea.style.opacity = "0";
+            formArea.style.transition = "opacity 0.5s";
 
-            const completeBox = document.getElementById('complete-box');
-            completeBox.classList.remove('hidden');
-            
-            // URLからコードを削除（リロード時のエラー表示防止のため）
-            window.history.replaceState({}, '', window.location.pathname);
+            setTimeout(() => {
+                formArea.classList.add('hidden');
+                document.body.style.backgroundColor = "";
+                document.body.style.backgroundImage = ""; // 背景リセット
+
+                const header = document.getElementById('page-header');
+                const completeBox = document.getElementById('complete-box');
+
+                header.classList.remove('hidden');
+                completeBox.classList.remove('hidden');
+                
+                // 再表示アニメーション
+                setTimeout(() => {
+                    header.style.opacity = "1";
+                    // completeBoxのアニメーションはCSSのfadeInUpで自動発火するよう再設定
+                    // クラスを付け直してアニメーション再始動
+                    completeBox.style.animation = 'none';
+                    completeBox.offsetHeight; /* trigger reflow */
+                    completeBox.style.animation = 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
+                }, 50);
+
+                window.history.replaceState({}, '', window.location.pathname);
+            }, 500);
         }
 
         function verifyCode(code, isAutoCheck) {
@@ -248,8 +460,8 @@
             
             if (!isAutoCheck) {
                 btn.disabled = true;
-                btn.innerText = "確認中...";
-                msg.innerText = "";
+                btn.innerHTML = '確認中<span style="display:inline-block; animation:spin 1s infinite linear; margin-left:5px;">↻</span>';
+                msg.classList.remove('visible');
             }
 
             fetch(API_URL, {
@@ -266,30 +478,36 @@
                         window.history.pushState({path: newUrl}, '', newUrl);
                     }
 
-                    header.classList.add('hidden');
-                    authBox.classList.add('hidden');
-                    
-                    const formArea = document.getElementById('form-area');
-                    const frame = document.getElementById('target-frame');
-                    
-                    // カウンターをリセットしてからURLセット
-                    iframeLoadCount = 0; 
-                    frame.src = data.formUrl;
-                    
-                    formArea.classList.remove('hidden');
-                    document.body.style.backgroundColor = "white";
+                    // 成功時アニメーション遷移
+                    if (!isAutoCheck) {
+                        fadeOutAuthArea(() => {
+                            showForm(data.formUrl);
+                        });
+                    } else {
+                        showForm(data.formUrl);
+                    }
 
                 } else {
                     // 失敗時
                     if (isAutoCheck) {
                         header.classList.remove('hidden');
+                        header.style.opacity = "1";
                         authBox.classList.remove('hidden');
+                        authBox.style.opacity = "1";
+                        authBox.style.transform = "translateY(0)";
+                        
                         msg.innerText = "このコードは既に使用済みです。\n再回答はできません。";
+                        msg.classList.add('visible');
+                        triggerShake();
+                        
                         document.getElementById('code').value = "";
                         window.history.replaceState({}, '', window.location.pathname);
                     } else {
                         authBox.classList.remove('hidden');
                         msg.innerText = data.message;
+                        msg.classList.add('visible');
+                        triggerShake();
+                        
                         btn.disabled = false;
                         btn.innerText = "認証する";
                     }
@@ -300,12 +518,31 @@
                 loader.classList.add('hidden');
                 if(isAutoCheck) {
                     header.classList.remove('hidden');
+                    header.style.opacity = "1";
                     authBox.classList.remove('hidden');
+                    authBox.style.opacity = "1";
                 }
                 msg.innerText = "通信エラーが発生しました。";
+                msg.classList.add('visible');
+                triggerShake();
+                
                 btn.disabled = false;
                 btn.innerText = "認証する";
             });
+        }
+
+        function showForm(url) {
+            const formArea = document.getElementById('form-area');
+            const frame = document.getElementById('target-frame');
+            
+            iframeLoadCount = 0; 
+            frame.src = url;
+            
+            formArea.classList.remove('hidden');
+            // 白背景にスムーズに移行
+            document.body.style.transition = "background-color 0.5s";
+            document.body.style.backgroundColor = "white";
+            document.body.style.backgroundImage = "none";
         }
     </script>
 </body>
