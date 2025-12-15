@@ -3,213 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>なずな祭 投票システム</title>
-    <!-- Google Fonts: 雰囲気に合うフォントを読み込み -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+    <title>市川学園 認証フォーム</title>
     <style>
+        /* 市川学園風テーマ設定 */
         :root {
-            --primary-color: #1a2a6c; /* 深い青 */
-            --accent-color: #b21f1f; /* アクセントの赤（えんじ色） */
-            --gold-color: #fdbb2d;   /* 豪華さの金 */
-            --text-white: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --school-navy: #182846; /* 鉄紺色に近い濃紺 */
+            --school-gold: #bfa455; /* 落ち着いたゴールド（アクセント） */
+            --bg-color: #f4f6f9;    /* 清潔感のある薄いグレー */
+            --text-main: #333333;
         }
 
         body {
-            font-family: 'Zen Kaku Gothic New', sans-serif;
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS PMincho", serif; /* 格調高い明朝体 */
             margin: 0;
-            overflow: hidden; /* 背景アニメーションのためスクロール禁止（初期状態） */
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            color: var(--text-white);
-            height: 100vh;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            position: relative;
+            min-height: 100vh;
         }
 
-        /* 背景のアニメーションパーティクル */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* ヘッダーエリア */
+        header {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-        .particle {
-            position: absolute;
-            display: block;
-            list-style: none;
-            width: 20px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            animation: animate 25s linear infinite;
-            bottom: -150px;
-            border-radius: 50%;
-        }
-        .particle:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
-        .particle:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
-        .particle:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
-        .particle:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
-        .particle:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
-        .particle:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
-        .particle:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
-        .particle:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
-        .particle:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
-        .particle:nth-child(10) { left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
-
-        @keyframes animate {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
-            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
-        }
-
-        /* メインコンテナ（グラスモーフィズム） */
-        #auth-box {
-            position: relative;
-            z-index: 10;
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background-color: var(--school-navy);
+            color: white;
+            padding: 20px 0;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            margin: 0;
+        }
+        
+        .sub-title {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+            letter-spacing: 0.05em;
+        }
+
+        /* 認証ボックスのデザイン */
+        #auth-box {
+            background: white;
             width: 90%;
             max-width: 450px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; transform: translateY(0); }
+            padding: 40px 30px;
+            border-top: 5px solid var(--school-gold); /* 上部にゴールドのアクセント */
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            box-sizing: border-box;
         }
 
         h2 {
-            font-family: 'Noto Serif JP', serif;
-            font-size: 2rem;
+            font-size: 20px;
             margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            border-bottom: 2px solid var(--gold-color);
-            display: inline-block;
-            padding-bottom: 5px;
+            color: var(--school-navy);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
         }
 
-        p.description {
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .input-group {
-            position: relative;
+        p {
+            font-family: "Helvetica Neue", Arial, sans-serif; /* 説明文は読みやすいゴシック体 */
+            font-size: 14px;
+            color: #666;
             margin-bottom: 25px;
         }
 
-        input {
+        /* 入力フォーム */
+        input[type="text"] {
             width: 100%;
-            padding: 15px;
-            font-size: 18px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid transparent;
-            border-radius: 50px;
-            outline: none;
-            transition: 0.3s;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
             text-align: center;
-            letter-spacing: 2px;
-            color: #333;
-            font-weight: bold;
+            letter-spacing: 0.1em;
+            transition: border-color 0.3s;
+            font-family: "Helvetica Neue", Arial, sans-serif;
         }
 
-        input:focus {
-            border-color: var(--gold-color);
-            box-shadow: 0 0 15px rgba(253, 187, 45, 0.5);
-            transform: scale(1.02);
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--school-navy);
+            background-color: #fcfcfc;
         }
 
+        /* ボタン */
         button {
-            width: 100%;
-            padding: 15px;
-            font-size: 1.1rem;
-            font-family: 'Noto Serif JP', serif;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            background-color: var(--school-navy);
+            color: white;
+            padding: 12px 40px;
+            font-size: 16px;
             border: none;
-            border-radius: 50px;
+            border-radius: 2px;
             cursor: pointer;
-            transition: 0.4s;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: opacity 0.3s, transform 0.1s;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+            width: 100%;
         }
 
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            filter: brightness(1.2);
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: translateY(1px);
         }
 
         button:disabled {
-            background: #888;
+            background-color: #ccc;
             cursor: not-allowed;
-            opacity: 0.7;
+            transform: none;
         }
 
-        /* エラーメッセージのアニメーション */
+        /* エラーメッセージ */
         #error-msg {
-            color: #ffcccc;
-            background: rgba(255, 0, 0, 0.2);
+            color: #d32f2f;
             margin-top: 15px;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            padding: 0;
-            height: 0;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        #error-msg.show {
-            padding: 10px;
-            height: auto;
+            font-weight: bold;
+            font-size: 13px;
         }
 
         /* フォーム表示エリア */
         #form-area {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            background: #fff;
-            z-index: 20;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-
-        #form-area.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        
-        /* iframe用ヘッダー（戻るボタンなどが必要な場合のため） */
-        .form-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            font-family: 'Noto Serif JP', serif;
+            background: white;
         }
 
         iframe {
@@ -220,51 +155,41 @@
 
         .hidden { display: none !important; }
 
-        /* ローディングスピナー */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
+        /* ローディングアニメーション */
+        #loader {
+            color: var(--school-navy);
+            font-weight: bold;
+            font-family: sans-serif;
+            margin-top: 50px;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- 背景エフェクト -->
-    <ul class="particles">
-        <li></li><li></li><li></li><li></li><li></li>
-        <li></li><li></li><li></li><li></li><li></li>
-    </ul>
+    <!-- ヘッダー -->
+    <header id="page-header">
+        <h1 class="school-name">市川学園</h1>
+        <div class="sub-title">ICHIKAWA GAKUEN</div>
+    </header>
 
     <!-- 認証エリア -->
     <div id="auth-box">
-        <h2>Nazuna Festival</h2>
-        <p class="description">シリアルコードを入力して<br>コンテンツへアクセスしてください</p>
+        <h2>シリアルコード認証</h2>
+        <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
         
-        <div class="input-group">
-            <input type="text" id="code" placeholder="CODE" autocomplete="off">
-        </div>
-        
-        <button id="btn" onclick="verifyCode()">
-            <span id="btn-text">認証して進む</span>
-        </button>
+        <input type="text" id="code" placeholder="コードを入力" autocomplete="off">
+        <br>
+        <button id="btn" onclick="handleManualAuth()">認証する</button>
         <p id="error-msg"></p>
     </div>
 
+    <!-- 自動チェック時のローダー -->
+    <div id="loader" class="hidden">
+        認証状況を確認しています...
+    </div>
+
     <!-- フォーム表示エリア -->
-    <div id="form-area">
-        <div class="form-header">市川学園 なずな祭</div>
+    <div id="form-area" class="hidden">
         <iframe id="target-frame" src=""></iframe>
     </div>
 
@@ -272,103 +197,95 @@
         // ▼ ここにGASのウェブアプリURLを貼り付けてください ▼
         const API_URL = "https://script.google.com/macros/s/AKfycbwRdqr4FR4ftRbci_oc6ioiKQUorrUaapsKPPyj41pmftBRmMaLx_XnuDB2_28hNFrmEg/exec"; 
 
-        function verifyCode() {
+        // ページ読み込み時に実行（戻るボタン対策）
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeFromUrl = urlParams.get('code');
+
+            if (codeFromUrl) {
+                // デザイン調整：ヘッダーと入力ボックスを隠す
+                document.getElementById('page-header').classList.add('hidden');
+                document.getElementById('auth-box').classList.add('hidden');
+                document.getElementById('loader').classList.remove('hidden');
+                
+                verifyCode(codeFromUrl, true);
+            }
+        };
+
+        function handleManualAuth() {
             const codeInput = document.getElementById('code').value;
+            if (!codeInput) return;
+            verifyCode(codeInput, false);
+        }
+
+        function verifyCode(code, isAutoCheck) {
             const btn = document.getElementById('btn');
-            const btnText = document.getElementById('btn-text');
             const msg = document.getElementById('error-msg');
+            const loader = document.getElementById('loader');
+            const authBox = document.getElementById('auth-box');
+            const header = document.getElementById('page-header');
             
-            if (!codeInput) {
-                showError("コードを入力してください");
-                return;
+            if (!isAutoCheck) {
+                btn.disabled = true;
+                btn.innerText = "確認中...";
+                msg.innerText = "";
             }
 
-            // UI変更：ローディング状態
-            btn.disabled = true;
-            btnText.innerHTML = '<div class="spinner"></div> 確認中...';
-            msg.classList.remove('show');
-            msg.innerText = "";
-
-            // GASのAPIにデータを送信
             fetch(API_URL, {
                 method: "POST",
-                body: JSON.stringify({ code: codeInput })
+                body: JSON.stringify({ code: code })
             })
             .then(response => response.json())
             .then(data => {
+                loader.classList.add('hidden');
+
                 if (data.result === 'success') {
-                    // 成功演出
-                    btnText.innerText = "認証成功！";
-                    btn.style.background = "#28a745"; // 成功時の緑色
+                    // 成功時：URL書き換え
+                    if (!isAutoCheck) {
+                        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?code=' + code;
+                        window.history.pushState({path: newUrl}, '', newUrl);
+                    }
+
+                    // デザイン調整：ヘッダーも隠してフォームを全画面表示
+                    header.classList.add('hidden');
+                    authBox.classList.add('hidden');
                     
-                    setTimeout(() => {
-                        // 少し待ってから画面遷移アニメーション
-                        const authBox = document.getElementById('auth-box');
-                        const formArea = document.getElementById('form-area');
-                        const frame = document.getElementById('target-frame');
-                        
-                        authBox.style.transform = "scale(0.8)";
-                        authBox.style.opacity = "0";
-                        
-                        setTimeout(() => {
-                            authBox.classList.add('hidden');
-                            frame.src = data.formUrl;
-                            formArea.classList.add('visible');
-                            // iframe表示後はbodyのスクロールロックを解除（必要であれば）
-                            document.body.style.overflow = "auto";
-                        }, 500);
-                    }, 800);
+                    const formArea = document.getElementById('form-area');
+                    const frame = document.getElementById('target-frame');
+                    frame.src = data.formUrl;
+                    formArea.classList.remove('hidden');
+                    
+                    // 背景色を白に戻す（フォームが見やすいように）
+                    document.body.style.backgroundColor = "white";
 
                 } else {
-                    // 失敗
-                    showError(data.message || "コードが正しくありません");
-                    resetButton();
+                    // 失敗時
+                    if (isAutoCheck) {
+                        header.classList.remove('hidden');
+                        authBox.classList.remove('hidden');
+                        msg.innerText = "このコードは既に使用済みです。\n再回答はできません。";
+                        document.getElementById('code').value = "";
+                        window.history.replaceState({}, '', window.location.pathname);
+                    } else {
+                        authBox.classList.remove('hidden');
+                        msg.innerText = data.message;
+                        btn.disabled = false;
+                        btn.innerText = "認証する";
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showError("通信エラーが発生しました。");
-                resetButton();
+                loader.classList.add('hidden');
+                if(isAutoCheck) {
+                    header.classList.remove('hidden');
+                    authBox.classList.remove('hidden');
+                }
+                msg.innerText = "通信エラーが発生しました。";
+                btn.disabled = false;
+                btn.innerText = "認証する";
             });
         }
-
-        function resetButton() {
-            const btn = document.getElementById('btn');
-            const btnText = document.getElementById('btn-text');
-            btn.disabled = false;
-            btnText.innerText = "認証して進む";
-        }
-
-        function showError(text) {
-            const msg = document.getElementById('error-msg');
-            msg.innerText = text;
-            msg.classList.add('show');
-            
-            // 入力欄を揺らすアニメーション
-            const input = document.getElementById('code');
-            input.style.animation = "shake 0.5s";
-            setTimeout(() => input.style.animation = "", 500);
-        }
-
-        // 入力欄でのEnterキー対応
-        document.getElementById('code').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                verifyCode();
-            }
-        });
-
-        // CSSに揺れるアニメーションを追加
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `
-            @keyframes shake {
-                0% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                50% { transform: translateX(5px); }
-                75% { transform: translateX(-5px); }
-                100% { transform: translateX(0); }
-            }
-        `;
-        document.head.appendChild(styleSheet);
     </script>
 </body>
 </html>
