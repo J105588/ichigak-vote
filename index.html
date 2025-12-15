@@ -7,14 +7,14 @@
     <style>
         /* 市川学園風テーマ設定 */
         :root {
-            --school-navy: #182846; /* 鉄紺色に近い濃紺 */
-            --school-gold: #bfa455; /* 落ち着いたゴールド（アクセント） */
-            --bg-color: #f4f6f9;    /* 清潔感のある薄いグレー */
+            --school-navy: #182846;
+            --school-gold: #bfa455;
+            --bg-color: #f4f6f9;
             --text-main: #333333;
         }
 
         body {
-            font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS PMincho", serif; /* 格調高い明朝体 */
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", "MS PMincho", serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
@@ -51,13 +51,13 @@
             letter-spacing: 0.05em;
         }
 
-        /* 認証ボックスのデザイン */
-        #auth-box {
+        /* 共通ボックスデザイン */
+        .box-style {
             background: white;
             width: 90%;
             max-width: 450px;
             padding: 40px 30px;
-            border-top: 5px solid var(--school-gold); /* 上部にゴールドのアクセント */
+            border-top: 5px solid var(--school-gold);
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             text-align: center;
@@ -73,13 +73,13 @@
         }
 
         p {
-            font-family: "Helvetica Neue", Arial, sans-serif; /* 説明文は読みやすいゴシック体 */
+            font-family: "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
             color: #666;
             margin-bottom: 25px;
+            line-height: 1.6;
         }
 
-        /* 入力フォーム */
         input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -100,7 +100,6 @@
             background-color: #fcfcfc;
         }
 
-        /* ボタン */
         button {
             background-color: var(--school-navy);
             color: white;
@@ -116,21 +115,10 @@
             width: 100%;
         }
 
-        button:hover {
-            opacity: 0.9;
-        }
+        button:hover { opacity: 0.9; }
+        button:active { transform: translateY(1px); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        button:active {
-            transform: translateY(1px);
-        }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* エラーメッセージ */
         #error-msg {
             color: #d32f2f;
             margin-top: 15px;
@@ -138,7 +126,7 @@
             font-size: 13px;
         }
 
-        /* フォーム表示エリア */
+        /* フォームエリア */
         #form-area {
             width: 100%;
             height: 100vh;
@@ -155,7 +143,6 @@
 
         .hidden { display: none !important; }
 
-        /* ローディングアニメーション */
         #loader {
             color: var(--school-navy);
             font-weight: bold;
@@ -166,14 +153,13 @@
 </head>
 <body>
 
-    <!-- ヘッダー -->
     <header id="page-header">
         <h1 class="school-name">市川学園</h1>
         <div class="sub-title">ICHIKAWA GAKUEN</div>
     </header>
 
     <!-- 認証エリア -->
-    <div id="auth-box">
+    <div id="auth-box" class="box-style">
         <h2>シリアルコード認証</h2>
         <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
         
@@ -183,31 +169,38 @@
         <p id="error-msg"></p>
     </div>
 
-    <!-- 自動チェック時のローダー -->
+    <!-- 完了メッセージエリア（送信後に表示） -->
+    <div id="complete-box" class="box-style hidden">
+        <h2>回答完了</h2>
+        <p>回答ありがとうございました。<br>送信が正常に完了いたしました。</p>
+        <p style="font-size: 12px; color: #999;">この画面を閉じて終了してください。</p>
+    </div>
+
+    <!-- ローダー -->
     <div id="loader" class="hidden">
         認証状況を確認しています...
     </div>
 
-    <!-- フォーム表示エリア -->
+    <!-- フォームエリア -->
     <div id="form-area" class="hidden">
         <iframe id="target-frame" src=""></iframe>
     </div>
 
     <script>
         // ▼ ここにGASのウェブアプリURLを貼り付けてください ▼
-        const API_URL = "https://script.google.com/macros/s/AKfycbwRdqr4FR4ftRbci_oc6ioiKQUorrUaapsKPPyj41pmftBRmMaLx_XnuDB2_28hNFrmEg/exec"; 
+        const API_URL = "https://script.google.com/macros/s/xxxxxxxxx/exec"; 
 
-        // ページ読み込み時に実行（戻るボタン対策）
+        // Iframeの読み込み回数カウンター
+        let iframeLoadCount = 0;
+
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const codeFromUrl = urlParams.get('code');
 
             if (codeFromUrl) {
-                // デザイン調整：ヘッダーと入力ボックスを隠す
                 document.getElementById('page-header').classList.add('hidden');
                 document.getElementById('auth-box').classList.add('hidden');
                 document.getElementById('loader').classList.remove('hidden');
-                
                 verifyCode(codeFromUrl, true);
             }
         };
@@ -216,6 +209,34 @@
             const codeInput = document.getElementById('code').value;
             if (!codeInput) return;
             verifyCode(codeInput, false);
+        }
+
+        // 送信完了検知のためのイベントリスナー設定
+        document.getElementById('target-frame').onload = function() {
+            if (iframeLoadCount === 0) {
+                // 初回ロード（フォーム表示）は何もしない
+                iframeLoadCount++;
+            } else {
+                // 2回目以降のロード（＝送信ボタン押下後とみなす）
+                showCompleteScreen();
+            }
+        };
+
+        function showCompleteScreen() {
+            // フォームを隠してヘッダーと完了メッセージを表示
+            document.getElementById('form-area').classList.add('hidden');
+            
+            // 背景色を戻す
+            document.body.style.backgroundColor = ""; 
+            
+            const header = document.getElementById('page-header');
+            header.classList.remove('hidden');
+
+            const completeBox = document.getElementById('complete-box');
+            completeBox.classList.remove('hidden');
+            
+            // URLからコードを削除（リロード時のエラー表示防止のため）
+            window.history.replaceState({}, '', window.location.pathname);
         }
 
         function verifyCode(code, isAutoCheck) {
@@ -240,22 +261,22 @@
                 loader.classList.add('hidden');
 
                 if (data.result === 'success') {
-                    // 成功時：URL書き換え
                     if (!isAutoCheck) {
                         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?code=' + code;
                         window.history.pushState({path: newUrl}, '', newUrl);
                     }
 
-                    // デザイン調整：ヘッダーも隠してフォームを全画面表示
                     header.classList.add('hidden');
                     authBox.classList.add('hidden');
                     
                     const formArea = document.getElementById('form-area');
                     const frame = document.getElementById('target-frame');
-                    frame.src = data.formUrl;
-                    formArea.classList.remove('hidden');
                     
-                    // 背景色を白に戻す（フォームが見やすいように）
+                    // カウンターをリセットしてからURLセット
+                    iframeLoadCount = 0; 
+                    frame.src = data.formUrl;
+                    
+                    formArea.classList.remove('hidden');
                     document.body.style.backgroundColor = "white";
 
                 } else {
