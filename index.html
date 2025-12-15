@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>市川学園 文化祭投票フォーム</title>
-    <!-- Google Fonts: 高級感のある明朝体 -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 市川学園風テーマ設定 */
+        /* テーマ設定 */
         :root {
             --school-navy: #182846;
             --school-gold: #bfa455;
@@ -33,7 +33,7 @@
             overflow-x: hidden;
         }
 
-        /* ヘッダーエリア */
+        /* ヘッダー */
         header {
             width: 100%;
             background: linear-gradient(135deg, var(--school-navy) 0%, #0f1a30 100%);
@@ -74,7 +74,7 @@
             text-transform: uppercase;
         }
 
-        /* 共通ボックスデザイン */
+        /* ボックス共通 */
         .box-style {
             background: white;
             width: 90%;
@@ -85,8 +85,10 @@
             box-shadow: var(--box-shadow);
             text-align: center;
             box-sizing: border-box;
-            opacity: 0; /* アニメーション用初期値 */
-            transform: translateY(20px); /* アニメーション用初期値 */
+            
+            /* 初期状態の設定 */
+            opacity: 0; 
+            transform: translateY(20px);
             animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
@@ -152,11 +154,6 @@
             background-color: #fbfbfb;
         }
 
-        input[type="text"]::placeholder {
-            color: #ccc;
-            transition: color 0.3s ease;
-        }
-
         input[type="text"]:focus {
             outline: none;
             border-color: var(--school-gold);
@@ -164,12 +161,8 @@
             box-shadow: 0 0 0 4px rgba(191, 164, 85, 0.15);
             transform: scale(1.01);
         }
-        
-        input[type="text"]:focus::placeholder {
-            color: transparent;
-        }
 
-        /* ボタンデザイン */
+        /* ボタン */
         button {
             background: linear-gradient(135deg, var(--school-navy) 0%, #2a3d61 100%);
             color: white;
@@ -188,7 +181,6 @@
             box-shadow: 0 4px 15px rgba(24, 40, 70, 0.3);
         }
 
-        /* ボタンの光るエフェクト */
         button::before {
             content: '';
             position: absolute;
@@ -196,12 +188,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.2),
-                transparent
-            );
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: 0.5s;
         }
 
@@ -210,24 +197,11 @@
             box-shadow: 0 8px 25px rgba(24, 40, 70, 0.4);
             background-color: #2a3d61;
         }
+        button:hover::before { left: 100%; }
+        button:active { transform: translateY(-1px); }
+        button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:active {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(24, 40, 70, 0.3);
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* エラーメッセージ */
+        /* エラーメッセージ（修正箇所：改行対応） */
         #error-msg {
             color: #d32f2f;
             margin-top: 20px;
@@ -236,6 +210,8 @@
             min-height: 20px;
             opacity: 0;
             transition: opacity 0.3s;
+            white-space: pre-wrap; /* \nを改行として表示 */
+            line-height: 1.6;
         }
 
         #error-msg.visible {
@@ -253,29 +229,21 @@
             animation: fadeIn 1s ease forwards;
         }
 
-        iframe {
-            width: 100%;
-            flex: 1;
-            border: none;
-        }
+        iframe { width: 100%; flex: 1; border: none; }
 
         /* アニメーション定義 */
         @keyframes slideDown {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         @keyframes fadeInUp {
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
-        /* エラー時の振動アニメーション */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -286,7 +254,6 @@
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
-        /* ローディングスピナー */
         .spinner {
             width: 40px;
             height: 40px;
@@ -296,7 +263,6 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 20px auto;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -313,7 +279,6 @@
         }
 
         .hidden { display: none !important; }
-
     </style>
 </head>
 <body>
@@ -336,7 +301,7 @@
         <p id="error-msg"></p>
     </div>
 
-    <!-- 完了メッセージエリア -->
+    <!-- 完了メッセージ -->
     <div id="complete-box" class="box-style hidden">
         <div style="font-size: 40px; color: var(--school-gold); margin-bottom: 10px;">✔</div>
         <h2>回答完了</h2>
@@ -356,7 +321,7 @@
     </div>
 
     <script>
-        // ▼ ここにGASのウェブアプリURLを貼り付けてください ▼
+        // ▼ GASのURL ▼
         const API_URL = "https://script.google.com/macros/s/AKfycbwRdqr4FR4ftRbci_oc6ioiKQUorrUaapsKPPyj41pmftBRmMaLx_XnuDB2_28hNFrmEg/exec"; 
 
         let iframeLoadCount = 0;
@@ -366,7 +331,7 @@
             const codeFromUrl = urlParams.get('code');
 
             if (codeFromUrl) {
-                // 自動遷移の場合のアニメーション
+                // 自動認証アニメーション開始
                 fadeOutAuthArea(() => {
                     document.getElementById('loader').classList.remove('hidden');
                     verifyCode(codeFromUrl, true);
@@ -378,6 +343,7 @@
             const header = document.getElementById('page-header');
             const authBox = document.getElementById('auth-box');
             
+            // CSS transitionでフェードアウト
             header.style.transition = "opacity 0.5s";
             authBox.style.transition = "opacity 0.5s, transform 0.5s";
             
@@ -403,11 +369,11 @@
             verifyCode(code, false);
         }
 
-        // エラー時の振動アニメーション発火
         function triggerShake() {
             const authBox = document.getElementById('auth-box');
+            // 一度クラスを外してリフローさせてから付け直すことでアニメーションを再生
             authBox.classList.remove('shake-anim');
-            void authBox.offsetWidth; // リフロー発生
+            void authBox.offsetWidth; 
             authBox.classList.add('shake-anim');
         }
 
@@ -422,14 +388,13 @@
         function showCompleteScreen() {
             const formArea = document.getElementById('form-area');
             
-            // フェードアウト
             formArea.style.opacity = "0";
             formArea.style.transition = "opacity 0.5s";
 
             setTimeout(() => {
                 formArea.classList.add('hidden');
                 document.body.style.backgroundColor = "";
-                document.body.style.backgroundImage = ""; // 背景リセット
+                document.body.style.backgroundImage = ""; 
 
                 const header = document.getElementById('page-header');
                 const completeBox = document.getElementById('complete-box');
@@ -437,15 +402,15 @@
                 header.classList.remove('hidden');
                 completeBox.classList.remove('hidden');
                 
-                // 再表示アニメーション
-                setTimeout(() => {
-                    header.style.opacity = "1";
-                    // completeBoxのアニメーションはCSSのfadeInUpで自動発火するよう再設定
-                    // クラスを付け直してアニメーション再始動
-                    completeBox.style.animation = 'none';
-                    completeBox.offsetHeight; /* trigger reflow */
-                    completeBox.style.animation = 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
-                }, 50);
+                // 表示を強制的にリセット
+                header.style.opacity = ""; 
+                completeBox.style.opacity = "";
+                completeBox.style.transform = "";
+                
+                // 完了画面のアニメーション再生
+                completeBox.style.animation = 'none';
+                completeBox.offsetHeight; 
+                completeBox.style.animation = 'fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards';
 
                 window.history.replaceState({}, '', window.location.pathname);
             }, 500);
@@ -476,10 +441,7 @@
                     if (!isAutoCheck) {
                         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?code=' + code;
                         window.history.pushState({path: newUrl}, '', newUrl);
-                    }
-
-                    // 成功時アニメーション遷移
-                    if (!isAutoCheck) {
+                        
                         fadeOutAuthArea(() => {
                             showForm(data.formUrl);
                         });
@@ -488,21 +450,26 @@
                     }
 
                 } else {
-                    // 失敗時
+                    // --- 失敗時の処理 ---
                     if (isAutoCheck) {
+                        // 自動チェック失敗時は隠していた要素を強制的に戻す
                         header.classList.remove('hidden');
-                        header.style.opacity = "1";
                         authBox.classList.remove('hidden');
-                        authBox.style.opacity = "1";
-                        authBox.style.transform = "translateY(0)";
+
+                        // インラインスタイルを削除してCSSクラスの状態に戻す
+                        header.style.opacity = ""; 
+                        authBox.style.opacity = "";
+                        authBox.style.transform = ""; 
                         
                         msg.innerText = "このコードは既に使用済みです。\n再回答はできません。";
                         msg.classList.add('visible');
+                        
                         triggerShake();
                         
                         document.getElementById('code').value = "";
                         window.history.replaceState({}, '', window.location.pathname);
                     } else {
+                        // 手動チェック失敗時
                         authBox.classList.remove('hidden');
                         msg.innerText = data.message;
                         msg.classList.add('visible');
@@ -516,13 +483,15 @@
             .catch(error => {
                 console.error('Error:', error);
                 loader.classList.add('hidden');
-                if(isAutoCheck) {
-                    header.classList.remove('hidden');
-                    header.style.opacity = "1";
-                    authBox.classList.remove('hidden');
-                    authBox.style.opacity = "1";
-                }
-                msg.innerText = "通信エラーが発生しました。";
+                
+                // エラー発生時も表示を強制復帰
+                header.classList.remove('hidden');
+                authBox.classList.remove('hidden');
+                header.style.opacity = ""; 
+                authBox.style.opacity = "";
+                authBox.style.transform = "";
+
+                msg.innerText = "通信エラーが発生しました。\nもう一度お試しください。";
                 msg.classList.add('visible');
                 triggerShake();
                 
@@ -539,7 +508,6 @@
             frame.src = url;
             
             formArea.classList.remove('hidden');
-            // 白背景にスムーズに移行
             document.body.style.transition = "background-color 0.5s";
             document.body.style.backgroundColor = "white";
             document.body.style.backgroundImage = "none";
