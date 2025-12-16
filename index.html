@@ -5,20 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>市川学園 文化祭投票フォーム</title>
     
-    <!-- ▼ ファビコン設定 ▼ -->
     <link rel="icon" href="https://www.ichigaku.ac.jp/html/top/images/img_topics04.jpg" type="image/jpeg">
-
-    <!-- ▼ 通信高速化設定（GASへの接続を事前確立） ▼ -->
     <link rel="preconnect" href="https://script.google.com">
     <link rel="preconnect" href="https://script.googleusercontent.com">
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* テーマ設定 */
         :root {
             --school-navy: #182846;
             --school-gold: #bfa455;
@@ -27,6 +21,7 @@
             --box-shadow: 0 10px 30px rgba(24, 40, 70, 0.15);
             --error-red: #d32f2f;
             --error-bg: #fdecea;
+            --success-green: #2e7d32; /* 成功色追加 */
         }
 
         body {
@@ -43,7 +38,6 @@
             overflow-x: hidden;
         }
 
-        /* ヘッダー */
         header {
             width: 100%;
             background: linear-gradient(135deg, var(--school-navy) 0%, #0f1a30 100%);
@@ -85,12 +79,11 @@
             text-transform: uppercase;
         }
 
-        /* ボックス共通 */
         .box-style {
             background: white;
             width: 90%;
-            max-width: 480px;
-            padding: 50px 35px;
+            max-width: 520px;
+            padding: 50px 20px;
             border-top: 5px solid var(--school-gold);
             border-radius: 8px;
             box-shadow: var(--box-shadow);
@@ -143,36 +136,51 @@
             line-height: 1.8;
         }
 
-        /* 入力フォーム */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-            width: 100%;
+        .serial-input-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 4px;
         }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            font-size: 18px;
+        .digit-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .char-input {
+            width: 36px;
+            height: 48px;
+            font-size: 20px;
             border: 2px solid #e0e0e0;
             border-radius: 4px;
             box-sizing: border-box;
             text-align: center;
-            letter-spacing: 0.15em;
             font-family: "Helvetica Neue", Arial, sans-serif;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             background-color: #fbfbfb;
+            padding: 0;
+            ime-mode: disabled; 
         }
 
-        input[type="text"]:focus {
+        .char-input:focus {
             outline: none;
             border-color: var(--school-gold);
             background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(191, 164, 85, 0.15);
-            transform: scale(1.01);
+            box-shadow: 0 0 0 3px rgba(191, 164, 85, 0.15);
+            transform: scale(1.1);
+            z-index: 2;
         }
 
-        /* ボタン */
+        .separator {
+            font-weight: bold;
+            color: #999;
+            user-select: none;
+            margin: 0 4px;
+            font-size: 18px;
+        }
+
         button {
             background: linear-gradient(135deg, var(--school-navy) 0%, #2a3d61 100%);
             color: white;
@@ -204,7 +212,6 @@
         button:active { transform: translateY(-1px); }
         button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* エラーメッセージ（UI表示用） */
         #error-msg {
             display: none;
             color: var(--error-red);
@@ -223,7 +230,33 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* フォームエリア */
+        /* 成功メッセージ用（一時表示） */
+        #success-msg-box {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 50px;
+            color: var(--success-green);
+            margin-bottom: 15px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .success-text {
+            color: var(--success-green);
+            font-weight: bold;
+            font-size: 18px;
+            letter-spacing: 0.1em;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         #form-area {
             width: 100%;
             height: 100vh;
@@ -236,7 +269,6 @@
 
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* アニメーション定義 */
         @keyframes slideDown {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -259,7 +291,6 @@
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
-        /* スピナー */
         .spinner {
             width: 40px;
             height: 40px;
@@ -298,6 +329,24 @@
         #loader span { margin-top: 20px; }
 
         .hidden { display: none !important; }
+        
+        @media (max-width: 480px) {
+            .char-input {
+                width: 28px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .separator {
+                margin: 0 2px;
+                font-size: 14px;
+            }
+            .digit-group {
+                gap: 2px;
+            }
+            .serial-input-wrapper {
+                gap: 2px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -307,24 +356,50 @@
         <div class="sub-title">NAZUNA FESTIVAL</div>
     </header>
 
-    <!-- 認証エリア -->
     <div id="auth-box" class="box-style">
-        <h2>シリアルコード認証</h2>
-        <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
-        
-        <div class="input-group">
-            <input type="text" id="code" placeholder="例: 123-abc-XYZ" autocomplete="off" maxlength="11">
+        <!-- 通常の認証コンテンツ -->
+        <div id="auth-content">
+            <h2>シリアルコード認証</h2>
+            <p>配布されたシリアルコードを入力して<br>「認証する」ボタンを押してください。</p>
+            
+            <div class="serial-input-wrapper" id="otp-container">
+                <!-- 1-3文字目 -->
+                <div class="digit-group">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                </div>
+                <span class="separator">-</span>
+                <!-- 4-6文字目 -->
+                <div class="digit-group">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                </div>
+                <span class="separator">-</span>
+                <!-- 7-9文字目 -->
+                <div class="digit-group">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                    <input type="text" class="char-input" maxlength="1" autocomplete="off" inputmode="url">
+                </div>
+            </div>
+            
+            <button id="btn" onclick="handleManualAuth()">
+                <span>認証する</span>
+            </button>
+            
+            <div id="error-msg"></div>
         </div>
-        
-        <button id="btn" onclick="handleManualAuth()">
-            <span>認証する</span>
-        </button>
-        
-        <!-- エラーメッセージ -->
-        <div id="error-msg"></div>
+
+        <!-- 認証成功時のメッセージ（最初は非表示） -->
+        <div id="success-msg-box">
+            <div class="success-icon">✔</div>
+            <div class="success-text">認証に成功しました</div>
+            <div style="font-size: 12px; color: #999; margin-top: 10px;">フォームへ移動します...</div>
+        </div>
     </div>
 
-    <!-- 完了メッセージ -->
     <div id="complete-box" class="box-style hidden">
         <div style="font-size: 40px; color: var(--school-gold); margin-bottom: 10px;">✔</div>
         <h2>回答完了</h2>
@@ -332,81 +407,125 @@
         <p style="font-size: 12px; color: #999;">この画面を閉じて終了してください。</p>
     </div>
 
-    <!-- 全画面ローダー（URL遷移時用） -->
     <div id="loader" class="hidden">
         <div class="spinner"></div>
         <span>認証状況を確認しています...</span>
     </div>
 
-    <!-- フォームエリア -->
     <div id="form-area" class="hidden">
         <iframe id="target-frame" src=""></iframe>
     </div>
 
     <script>
-        // ▼ GASのURL ▼
         const API_URL = "https://script.google.com/macros/s/AKfycbxN-Xz_haIEcZwn8qmZZ_aaQijcCgEOyEg8hVhOcf6QYRf5BsWEr6JYvY88fhvE2NHb7Q/exec"; 
 
         let iframeLoadCount = 0;
-
-        // ★コード形式の正規表現: 英数字3文字-英数字3文字-英数字3文字
-        // 大文字小文字区別なし (a-z, A-Z, 0-9)
         const CODE_REGEX = /^[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}-[a-zA-Z0-9]{3}$/;
+
+        const inputs = document.querySelectorAll('.char-input');
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const codeFromUrl = urlParams.get('code');
 
+            setupInputControls();
+
             if (codeFromUrl) {
-                // 自動認証: まず要素を隠してからローダー表示
-                fadeOutAuthArea(() => {
-                    document.getElementById('loader').classList.remove('hidden');
-                    verifyCode(codeFromUrl, true);
-                });
+                const rawCode = codeFromUrl.replace(/-/g, '');
+                if(rawCode.length === 9) {
+                    inputs.forEach((input, index) => {
+                        input.value = rawCode[index] || '';
+                    });
+                }
+                
+                // 自動認証の場合もいったんUIを隠す
+                document.getElementById('auth-box').classList.add('hidden');
+                document.getElementById('loader').classList.remove('hidden');
+                verifyCode(codeFromUrl, true);
             }
         };
 
-        // 入力時のイベント：エラーを消す
-        document.getElementById('code').addEventListener('input', function(e) {
-            document.getElementById('error-msg').style.display = 'none';
-        });
+        function setupInputControls() {
+            inputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    document.getElementById('error-msg').style.display = 'none';
+                    const val = input.value;
+                    if (!/^[a-zA-Z0-9]$/.test(val)) {
+                        input.value = '';
+                        return; 
+                    }
+                    if (val.length === 1) {
+                        if (index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    }
+                });
 
-        // エラーを表示する関数（UI + 振動 + アラート）
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && input.value.length === 0) {
+                        e.preventDefault();
+                        if (index > 0) {
+                            const prev = inputs[index - 1];
+                            prev.focus();
+                        }
+                    } else if (e.key === 'ArrowLeft') {
+                        if (index > 0) inputs[index - 1].focus();
+                    } else if (e.key === 'ArrowRight') {
+                        if (index < inputs.length - 1) inputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('focus', function() {
+                    this.select();
+                });
+
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim();
+                    let cleanData = pasteData.replace(/-/g, '');
+                    for (let i = 0; i < cleanData.length; i++) {
+                        if (index + i < inputs.length) {
+                            inputs[index + i].value = cleanData[i];
+                        }
+                    }
+                    const targetIndex = Math.min(index + cleanData.length, inputs.length - 1);
+                    inputs[targetIndex].focus();
+                });
+            });
+        }
+
         function showError(message) {
             const msgBox = document.getElementById('error-msg');
             const authBox = document.getElementById('auth-box');
             
-            // 1. UIに表示
             msgBox.innerText = message;
             msgBox.style.display = 'block';
             
-            // 振動アニメーションのリセットと実行
             authBox.classList.remove('shake-anim');
-            void authBox.offsetWidth; // Reflowを強制してアニメーションをリセット
+            void authBox.offsetWidth;
             authBox.classList.add('shake-anim');
 
-            // 2. アラートも表示 (UIの描画完了を待つため少し遅延)
             setTimeout(() => {
                 alert(message);
             }, 50);
         }
 
-        // UIの状態をリセットして認証画面を表示する関数
         function resetToAuthScreen(errorMessage) {
             const header = document.getElementById('page-header');
             const authBox = document.getElementById('auth-box');
             const loader = document.getElementById('loader');
             const msgBox = document.getElementById('error-msg');
             const btn = document.getElementById('btn');
+            
+            // 認証成功画面を隠して、入力画面を出す
+            document.getElementById('success-msg-box').style.display = 'none';
+            document.getElementById('auth-content').style.display = 'block';
 
-            // ローダーを隠す
             loader.classList.add('hidden');
 
-            // 認証画面要素の復活
             header.classList.remove('hidden');
             authBox.classList.remove('hidden');
             
-            // 強制的に不透明度を1に設定して表示させる
             header.style.opacity = "1";
             header.style.transition = "none";
             
@@ -414,11 +533,9 @@
             authBox.style.transform = "translateY(0)";
             authBox.style.transition = "none";
 
-            // ボタンの状態リセット
             btn.disabled = false;
             btn.innerHTML = '<span>認証する</span>';
 
-            // エラーがある場合の処理
             if (errorMessage) {
                 showError(errorMessage);
             } else {
@@ -445,31 +562,29 @@
         }
 
         function handleManualAuth() {
-            const codeInput = document.getElementById('code');
-            let code = codeInput.value;
+            let rawValues = "";
+            inputs.forEach(input => {
+                rawValues += input.value.trim();
+            });
             
-            // 空白除去
-            code = code.trim();
-            codeInput.value = code;
+            if (rawValues.length < 9) {
+                showError("コードをすべて入力してください");
+                return;
+            }
 
-            // UI上のエラー表示はいったん消す
+            const p1 = rawValues.substring(0, 3);
+            const p2 = rawValues.substring(3, 6);
+            const p3 = rawValues.substring(6, 9);
+            const formattedCode = `${p1}-${p2}-${p3}`;
+            
             document.getElementById('error-msg').style.display = 'none';
 
-            // 1. 空チェック
-            if (!code) {
-                showError("コードを入力してください");
+            if (!CODE_REGEX.test(formattedCode)) {
+                showError("コードの形式が正しくありません。\n半角英数字で入力してください");
                 return;
             }
 
-            // 2. 正規表現による形式チェック
-            // matchではなくtestを使用し、bool値を判定
-            if (!CODE_REGEX.test(code)) {
-                showError("コードの形式が正しくありません。\n例: 123-abc-XYZ");
-                return;
-            }
-
-            // 3. 形式OKならAPI送信
-            verifyCode(code, false);
+            verifyCode(formattedCode, false);
         }
 
         document.getElementById('target-frame').onload = function() {
@@ -524,28 +639,43 @@
             .then(response => response.json())
             .then(data => {
                 if (data.result === 'success') {
-                    // 成功時
+                    // --- 成功時の処理変更 ---
                     document.getElementById('loader').classList.add('hidden');
                     
                     if (!isAutoCheck) {
+                        // 手動認証の場合: 認証ボックス内で成功メッセージを表示
+                        const authContent = document.getElementById('auth-content');
+                        const successBox = document.getElementById('success-msg-box');
+                        
+                        // 入力フォームを消して、成功メッセージを出す
+                        authContent.style.display = 'none';
+                        successBox.style.display = 'flex'; // flexで中央揃え
+
+                        // URL更新
                         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?code=' + code;
                         window.history.pushState({path: newUrl}, '', newUrl);
-                        
-                        fadeOutAuthArea(() => {
-                            showForm(data.formUrl);
-                        });
+
+                        // 1.5秒待ってからフェードアウト→フォーム表示
+                        setTimeout(() => {
+                            fadeOutAuthArea(() => {
+                                showForm(data.formUrl);
+                            });
+                        }, 1500);
+
                     } else {
+                        // 自動認証の場合: すぐにフォームへ
                         showForm(data.formUrl);
                     }
 
                 } else {
-                    // 失敗時
                     const msg = isAutoCheck ? 
                         "このコードは既に使用済みか無効です。\n再回答はできません。" : 
                         data.message;
                     
                     if (isAutoCheck) {
-                        document.getElementById('code').value = "";
+                        // 自動認証失敗時は、いったん隠していた認証ボックスを表示させるためにresetを呼ぶ
+                        document.getElementById('auth-box').classList.remove('hidden');
+                        inputs.forEach(input => input.value = "");
                         window.history.replaceState({}, '', window.location.pathname);
                     }
                     
@@ -553,8 +683,10 @@
                 }
             })
             .catch(error => {
-                // 通信エラー時
                 console.error('Error:', error);
+                if (isAutoCheck) {
+                    document.getElementById('auth-box').classList.remove('hidden');
+                }
                 resetToAuthScreen("通信エラーが発生しました。\nもう一度お試しください。");
             });
         }
